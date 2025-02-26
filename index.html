@@ -20,45 +20,40 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             display: inline-block;
             width: 90%;
-            max-width: 400px;
+            max-width: 500px;
         }
         h2 {
             color: #007bff;
         }
-        .input-group {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin: 10px 0;
-        }
         .glass-container {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
+            gap: 10px;
             margin-top: 10px;
         }
         .glass-item {
-            width: 100px;
-            height: 150px;
+            width: 220px;
             border: 2px solid #007bff;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             color: #007bff;
             background-color: rgba(0, 123, 255, 0.1);
             position: relative;
+            padding: 10px;
+            border-radius: 8px;
         }
-        .glass-item span {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: white;
-            padding: 2px 5px;
-            border-radius: 5px;
-            font-size: 14px;
-            color: #007bff;
+        .glass-item select, .glass-item input {
+            margin: 5px;
+            font-size: 16px;
+            padding: 5px;
+        }
+        .quantity-controls {
+            display: flex;
+            align-items: center;
         }
         button {
             background-color: #007bff;
@@ -68,9 +63,16 @@
             cursor: pointer;
             border-radius: 5px;
             transition: background 0.3s;
+            font-size: 16px;
+            margin: 5px;
         }
         button:hover {
             background-color: #0056b3;
+        }
+        select {
+            font-size: 16px;
+            padding: 8px;
+            width: auto;
         }
         #result {
             font-size: 20px;
@@ -88,48 +90,70 @@
 <body>
     <div class="container">
         <h2>Oynak Hisoblagich</h2>
-        <label for="width">Kenglik (sm):</label>
-        <input type="number" id="width" value="100"><br>
-        <label for="height">Balandlik (sm):</label>
-        <input type="number" id="height" value="150"><br>
-        <label for="glassType">Oynak turi:</label>
-        <select id="glassType">
-            <option value="oq">Oq</option>
-        </select><br>
-        <div class="input-group">
-            <button onclick="addGlass()">+</button>
-            <span id="glassCount">1x</span>
-            <button onclick="removeGlass()">-</button>
-        </div>
-        <div class="glass-container">
-            <div class="glass-item" id="glassItem"><span id="glassMultiplier">1x</span></div>
-        </div>
-        <button onclick="calculateGlassPrice()">Hisoblash</button>
+        <button onclick="addNewGlass()">Yangi qo‘shish</button>
+        <div class="glass-container" id="glassContainer"></div>
+        <button onclick="calculateTotalPrice()">Hisoblash</button>
         <p id="result"></p>
         <p class="footer">Dastur: UzOynobusung</p>
     </div>
     <script>
-        let glassCount = 1;
-        function addGlass() {
-            glassCount++;
-            updateGlassDisplay();
+        let glassList = [];
+        const glassPrices = {
+            "oq": 55000,
+            "yodiviy": 90000,
+            "guli oq": 130000,
+            "yog guli": 230000,
+            "kozgu": 65000
+        };
+        function addNewGlass() {
+            let glassContainer = document.getElementById("glassContainer");
+            let newGlass = document.createElement("div");
+            newGlass.className = "glass-item";
+            newGlass.innerHTML = `
+                <select class="glassType" onchange="updatePrice(this.parentElement)">
+                    <option value="oq">Oq</option>
+                    <option value="yodiviy">Yodiviy</option>
+                    <option value="guli oq">Guli Oq</option>
+                    <option value="yog guli">Yog Guli</option>
+                    <option value="kozgu">Kozgu</option>
+                </select>
+                <div style="display: flex; align-items: center;">
+                    <button onclick="changeQuantity(this, -1)">-</button>
+                    <span class="quantity">1x</span>
+                    <button onclick="changeQuantity(this, 1)">+</button>
+                </div>
+                <div style="border: 2px solid #007bff; padding: 10px; margin-top: 10px; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;">
+                    <input type="number" class="width" value="100" oninput="updatePrice(this.parentElement.parentElement)" style="width: 40px;"> x 
+                    <input type="number" class="height" value="150" oninput="updatePrice(this.parentElement.parentElement)" style="width: 40px;">
+                </div>
+                <p class="price">0 so‘m</p>
+            `;
+            glassContainer.appendChild(newGlass);
+            updatePrice(newGlass);
         }
-        function removeGlass() {
-            if (glassCount > 1) {
-                glassCount--;
-                updateGlassDisplay();
-            }
+        function updatePrice(glassElement) {
+            let type = glassElement.querySelector(".glassType").value;
+            let width = parseFloat(glassElement.querySelector(".width").value) / 100;
+            let height = parseFloat(glassElement.querySelector(".height").value) / 100;
+            let quantity = parseInt(glassElement.querySelector(".quantity").innerText);
+            let priceElement = glassElement.querySelector(".price");
+            let total = (glassPrices[type] * width * height * quantity);
+            priceElement.innerText = `${total.toLocaleString()} so‘m`;
         }
-        function updateGlassDisplay() {
-            document.getElementById("glassCount").innerText = glassCount + "x";
-            document.getElementById("glassMultiplier").innerText = glassCount + "x";
+        function changeQuantity(button, delta) {
+            let glassElement = button.parentElement.parentElement;
+            let quantityElement = glassElement.querySelector(".quantity");
+            let quantity = parseInt(quantityElement.innerText);
+            quantity = Math.max(1, quantity + delta);
+            quantityElement.innerText = `${quantity}x`;
+            updatePrice(glassElement);
         }
-        function calculateGlassPrice() {
-            const width = parseFloat(document.getElementById("width").value) / 100;
-            const height = parseFloat(document.getElementById("height").value) / 100;
-            const glassPrice = 50000;
-            const area = width * height;
-            const totalPrice = glassCount * (area * glassPrice);
+        function calculateTotalPrice() {
+            let totalPrice = 0;
+            document.querySelectorAll(".glass-item").forEach(glassElement => {
+                updatePrice(glassElement);
+                totalPrice += parseFloat(glassElement.querySelector(".price").innerText.replace(/[^0-9]/g, ''));
+            });
             document.getElementById("result").innerText = `Jami oynak narxi: ${totalPrice.toLocaleString()} so‘m`;
         }
     </script>
