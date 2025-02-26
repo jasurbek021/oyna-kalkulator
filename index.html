@@ -25,12 +25,40 @@
         h2 {
             color: #007bff;
         }
-        label, input, select, button {
-            margin: 10px;
-            padding: 8px;
-            font-size: 16px;
-            width: 90%;
-            max-width: 300px;
+        .input-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .glass-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .glass-item {
+            width: 100px;
+            height: 150px;
+            border: 2px solid #007bff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+            background-color: rgba(0, 123, 255, 0.1);
+            position: relative;
+        }
+        .glass-item span {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: white;
+            padding: 2px 5px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #007bff;
         }
         button {
             background-color: #007bff;
@@ -66,38 +94,42 @@
         <input type="number" id="height" value="150"><br>
         <label for="glassType">Oynak turi:</label>
         <select id="glassType">
-            <option value="oddiy">Oddiy</option>
-            <option value="energiya tejamkor">Energiya tejamkor</option>
-            <option value="temperli">Temperli</option>
             <option value="oq">Oq</option>
-            <option value="oyna yodiviy">Oyna yodiviy</option>
         </select><br>
+        <div class="input-group">
+            <button onclick="addGlass()">+</button>
+            <span id="glassCount">1x</span>
+            <button onclick="removeGlass()">-</button>
+        </div>
+        <div class="glass-container">
+            <div class="glass-item" id="glassItem"><span id="glassMultiplier">1x</span></div>
+        </div>
         <button onclick="calculateGlassPrice()">Hisoblash</button>
         <p id="result"></p>
         <p class="footer">Dastur: UzOynobusung</p>
     </div>
     <script>
+        let glassCount = 1;
+        function addGlass() {
+            glassCount++;
+            updateGlassDisplay();
+        }
+        function removeGlass() {
+            if (glassCount > 1) {
+                glassCount--;
+                updateGlassDisplay();
+            }
+        }
+        function updateGlassDisplay() {
+            document.getElementById("glassCount").innerText = glassCount + "x";
+            document.getElementById("glassMultiplier").innerText = glassCount + "x";
+        }
         function calculateGlassPrice() {
             const width = parseFloat(document.getElementById("width").value) / 100;
             const height = parseFloat(document.getElementById("height").value) / 100;
-            const glassType = document.getElementById("glassType").value;
-            
-            const glassPrices = {
-                "oddiy": 50000,
-                "energiya tejamkor": 70000,
-                "temperli": 90000,
-                "oq": 50000,
-                "oyna yodiviy": 120000
-            };
-            
-            if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0 || !glassPrices[glassType]) {
-                document.getElementById("result").innerText = "Noto‘g‘ri ma'lumot kiritildi!";
-                return;
-            }
-            
+            const glassPrice = 50000;
             const area = width * height;
-            const totalPrice = area * glassPrices[glassType];
-            
+            const totalPrice = glassCount * (area * glassPrice);
             document.getElementById("result").innerText = `Jami oynak narxi: ${totalPrice.toLocaleString()} so‘m`;
         }
     </script>
