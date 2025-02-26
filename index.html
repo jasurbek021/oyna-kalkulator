@@ -69,6 +69,9 @@
         button:hover {
             background-color: #0056b3;
         }
+        .package-enabled button {
+            background-color: #28a745;
+        }
         select {
             font-size: 16px;
             padding: 8px;
@@ -105,6 +108,7 @@
             "yog guli": 230000,
             "kozgu": 65000
         };
+        const packagePrice = 45000;
         function addNewGlass() {
             let glassContainer = document.getElementById("glassContainer");
             let newGlass = document.createElement("div");
@@ -126,6 +130,7 @@
                     <input type="number" class="width" value="100" oninput="updatePrice(this.parentElement.parentElement)" style="width: 40px;"> x 
                     <input type="number" class="height" value="150" oninput="updatePrice(this.parentElement.parentElement)" style="width: 40px;">
                 </div>
+                <button onclick="togglePackage(this)">Paket</button>
                 <p class="price">0 so‘m</p>
             `;
             glassContainer.appendChild(newGlass);
@@ -137,24 +142,17 @@
             let height = parseFloat(glassElement.querySelector(".height").value) / 100;
             let quantity = parseInt(glassElement.querySelector(".quantity").innerText);
             let priceElement = glassElement.querySelector(".price");
-            let total = (glassPrices[type] * width * height * quantity);
+            let isPackage = glassElement.classList.contains("package-enabled");
+            let total = (glassPrices[type] * width * height * quantity) * (isPackage ? 2 : 1);
+            if (isPackage) {
+                total += (width * height * packagePrice);
+            }
             priceElement.innerText = `${total.toLocaleString()} so‘m`;
         }
-        function changeQuantity(button, delta) {
-            let glassElement = button.parentElement.parentElement;
-            let quantityElement = glassElement.querySelector(".quantity");
-            let quantity = parseInt(quantityElement.innerText);
-            quantity = Math.max(1, quantity + delta);
-            quantityElement.innerText = `${quantity}x`;
+        function togglePackage(button) {
+            let glassElement = button.parentElement;
+            glassElement.classList.toggle("package-enabled");
             updatePrice(glassElement);
-        }
-        function calculateTotalPrice() {
-            let totalPrice = 0;
-            document.querySelectorAll(".glass-item").forEach(glassElement => {
-                updatePrice(glassElement);
-                totalPrice += parseFloat(glassElement.querySelector(".price").innerText.replace(/[^0-9]/g, ''));
-            });
-            document.getElementById("result").innerText = `Jami oynak narxi: ${totalPrice.toLocaleString()} so‘m`;
         }
     </script>
 </body>
