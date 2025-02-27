@@ -1,159 +1,194 @@
 <!DOCTYPE html>
 <html lang="uz">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Oynak Hisoblagich - UzOynobusung</title>
-    <link rel="icon" href="icon.png" type="image/png">
+    <link rel="icon" href="icon.png" type="image/png" />
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #e3f2fd;
-            padding: 20px;
-            margin: 0;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: inline-block;
-            width: 90%;
-            max-width: 500px;
-        }
-        h2 {
-            color: #007bff;
-        }
-        .glass-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .glass-item {
-            width: 220px;
-            border: 2px solid #007bff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 16px;
-            font-weight: bold;
-            color: #007bff;
-            background-color: rgba(0, 123, 255, 0.1);
-            position: relative;
-            padding: 10px;
-            border-radius: 8px;
-        }
-        .glass-item select, .glass-item input {
-            margin: 5px;
-            font-size: 16px;
-            padding: 5px;
-        }
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background 0.3s;
-            font-size: 16px;
-            margin: 5px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .package-enabled button {
-            background-color: #28a745;
-        }
-        select {
-            font-size: 16px;
-            padding: 8px;
-            width: auto;
-        }
-        #result {
-            font-size: 20px;
-            margin-top: 15px;
-            font-weight: bold;
-            color: #333;
-        }
-        .footer {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #666;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: #e3f2fd;
+        padding: 20px;
+        margin: 0;
+      }
+      .container {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: inline-block;
+        width: 90%;
+        max-width: 500px;
+      }
+      h2 {
+        color: #007bff;
+      }
+      .glass-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .glass-item {
+        width: 220px;
+        border: 2px solid #007bff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 16px;
+        font-weight: bold;
+        color: #007bff;
+        background-color: rgba(0, 123, 255, 0.1);
+        position: relative;
+        padding: 10px;
+        border-radius: 8px;
+      }
+      .glass-item select,
+      .glass-item input {
+        margin: 5px;
+        font-size: 16px;
+        padding: 5px;
+      }
+      .quantity-controls {
+        display: flex;
+        align-items: center;
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background 0.3s;
+        font-size: 16px;
+        margin: 5px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      .package-enabled button {
+        background-color: #28a745;
+      }
+      select {
+        font-size: 16px;
+        padding: 8px;
+        width: auto;
+      }
+      #result {
+        font-size: 20px;
+        margin-top: 15px;
+        font-weight: bold;
+        color: #333;
+      }
+      .footer {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #666;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h2>Oynak Hisoblagich</h2>
-        <button onclick="addNewGlass()">Yangi qo‘shish</button>
-        <div class="glass-container" id="glassContainer"></div>
-        <button onclick="calculateTotalPrice()">Hisoblash</button>
-        <p id="result"></p>
-        <p class="footer">Dastur: UzOynobusung</p>
+      <h2>Oynak Hisoblagich</h2>
+      <button onclick="addNewGlass()">Yangi qo‘shish</button>
+      <div class="glass-container" id="glassContainer"></div>
+      <button onclick="calculateTotalPrice()">Hisoblash</button>
+      <p id="totalPrice">Umumiy narx: 0 so‘m</p>
+      <p class="footer">Dastur: UzOynobusung</p>
     </div>
     <script>
-        let glassList = [];
-        const glassPrices = {
-            "oq": 55000,
-            "yodiviy": 90000,
-            "guli oq": 130000,
-            "yog guli": 230000,
-            "kozgu": 65000
-        };
-        const packagePrice = 45000;
-        function addNewGlass() {
-            let glassContainer = document.getElementById("glassContainer");
-            let newGlass = document.createElement("div");
-            newGlass.className = "glass-item";
-            newGlass.innerHTML = `
+      const glassPrices = {
+        oq: 55000,
+        yodiviy: 90000,
+        "guli oq": 130000,
+        "yog guli": 230000,
+        kozgu: 65000,
+      };
+      const packagePrice = 45000;
+      function addNewGlass() {
+        let glassContainer = document.getElementById("glassContainer");
+        let newGlass = document.createElement("div");
+        newGlass.className = "glass-item";
+        newGlass.innerHTML = `
                 <select class="glassType" onchange="updatePrice(this.parentElement)">
-                    <option value="oq">Oq</option>
-                    <option value="yodiviy">Yodiviy</option>
-                    <option value="guli oq">Guli Oq</option>
-                    <option value="yog guli">Yog Guli</option>
-                    <option value="kozgu">Kozgu</option>
+                    ${Object.keys(glassPrices)
+                      .map(
+                        (type) =>
+                          `<option value="${type}">${
+                            type.charAt(0).toUpperCase() + type.slice(1)
+                          }</option>`
+                      )
+                      .join("")}
                 </select>
-                <div style="display: flex; align-items: center;">
+                <div class="quantity-controls">
                     <button onclick="changeQuantity(this, -1)">-</button>
-                    <span class="quantity">1x</span>
+                    <span class="quantity">1</span>
                     <button onclick="changeQuantity(this, 1)">+</button>
                 </div>
-                <div style="border: 2px solid #007bff; padding: 10px; margin-top: 10px; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;">
-                    <input type="number" class="width" value="100" oninput="updatePrice(this.parentElement.parentElement)" style="width: 40px;"> x 
-                    <input type="number" class="height" value="150" oninput="updatePrice(this.parentElement.parentElement)" style="width: 40px;">
+                <div>
+                    <input type="number" class="width" value="100" min="10" oninput="updatePrice(this.parentElement.parentElement)"> x 
+                    <input type="number" class="height" value="150" min="10" oninput="updatePrice(this.parentElement.parentElement)">
                 </div>
                 <button onclick="togglePackage(this)">Paket</button>
                 <p class="price">0 so‘m</p>
+                <button style="background-color:red;"  onclick="removeGlass(this)">O‘chirish</button>
             `;
-            glassContainer.appendChild(newGlass);
-            updatePrice(newGlass);
+        glassContainer.appendChild(newGlass);
+        updatePrice(newGlass);
+      }
+      function updatePrice(glassElement) {
+        let type = glassElement.querySelector(".glassType").value;
+        let width =
+          parseFloat(glassElement.querySelector(".width").value) / 100;
+        let height =
+          parseFloat(glassElement.querySelector(".height").value) / 100;
+        let quantity = parseInt(
+          glassElement.querySelector(".quantity").innerText
+        );
+        let priceElement = glassElement.querySelector(".price");
+        let isPackage = glassElement.classList.contains("package-enabled");
+        let total =
+          glassPrices[type] * width * height * quantity * (isPackage ? 2 : 1);
+        if (isPackage) {
+          total += width * height * packagePrice;
         }
-        function updatePrice(glassElement) {
-            let type = glassElement.querySelector(".glassType").value;
-            let width = parseFloat(glassElement.querySelector(".width").value) / 100;
-            let height = parseFloat(glassElement.querySelector(".height").value) / 100;
-            let quantity = parseInt(glassElement.querySelector(".quantity").innerText);
-            let priceElement = glassElement.querySelector(".price");
-            let isPackage = glassElement.classList.contains("package-enabled");
-            let total = (glassPrices[type] * width * height * quantity) * (isPackage ? 2 : 1);
-            if (isPackage) {
-                total += (width * height * packagePrice);
-            }
-            priceElement.innerText = `${total.toLocaleString()} so‘m`;
-        }
-        function togglePackage(button) {
-            let glassElement = button.parentElement;
-            glassElement.classList.toggle("package-enabled");
-            updatePrice(glassElement);
-        }
+        priceElement.innerText = `${total.toLocaleString()} so‘m`;
+        calculateTotalPrice();
+      }
+      function changeQuantity(button, amount) {
+        let quantityElement = button.parentElement.querySelector(".quantity");
+        let quantity = Math.max(
+          1,
+          parseInt(quantityElement.innerText) + amount
+        );
+        quantityElement.innerText = quantity;
+        updatePrice(button.parentElement.parentElement);
+      }
+      function togglePackage(button) {
+        let glassElement = button.parentElement;
+        glassElement.classList.toggle("package-enabled");
+        updatePrice(glassElement);
+      }
+      function removeGlass(button) {
+        button.parentElement.remove();
+        calculateTotalPrice();
+      }
+      function calculateTotalPrice() {
+        let total = 0;
+        document.querySelectorAll(".glass-item").forEach((glass) => {
+          let price = parseInt(
+            glass.querySelector(".price").innerText.replace(/[^0-9]/g, "")
+          );
+          total += price;
+        });
+        document.getElementById(
+          "totalPrice"
+        ).innerText = `Umumiy narx: ${total.toLocaleString()} so‘m`;
+      }
     </script>
-</body>
+  </body>
 </html>
